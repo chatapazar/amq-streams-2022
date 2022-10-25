@@ -1,4 +1,4 @@
-# Kafka introduction
+# Introduction to AMQ Streams
 
 ## Start ZooKeeper
 

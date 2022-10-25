@@ -1,6 +1,6 @@
-# Apache Kafka Enablement training 2020
+# AMQ Streams Training 2022
 
-This repository includes the demos and labs for the Apache Kafka Enablement training in 2020.
+This repository includes the demos and labs for the AMQ Steams 2022.
 Following demos are included:
 
 * [Introduction to Kafka](./kafka-introduction)
