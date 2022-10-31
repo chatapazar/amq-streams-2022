@@ -1,5 +1,7 @@
 # Introduction to AMQ Streams
 
+
+
 ## Lab Folder
 
 * Go to Lab Folder

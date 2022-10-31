@@ -1,1 +1,0 @@
-The first sample file for S3 upload
