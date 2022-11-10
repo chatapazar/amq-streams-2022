@@ -6,7 +6,12 @@
 
 Setup and start the Zookeeper and Kafka cluster from the [Kafka Architecture demo](../kafka-architecture/).
 This cluster will be used for this lab. 
-
+./scripts/zookeeper-0.sh
+./scripts/zookeeper-1.sh
+./scripts/zookeeper-2.sh
+./scripts/kafka-0.sh
+./scripts/kafka-1.sh
+./scripts/kafka-2.sh
 ### Topics
 
 * We already used a lot of commands.

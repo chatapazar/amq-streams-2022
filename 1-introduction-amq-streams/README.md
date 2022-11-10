@@ -100,4 +100,9 @@ c
 ```
 ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --all-groups
 ```
+jps
 
+./kafka/bin/kafka-server-start.sh ./kafka/config/server.properties
+./kafka/bin/zookeeper-server-start.sh ./kafka/config/zookeeper.properties
+
+jps
