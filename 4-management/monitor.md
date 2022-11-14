@@ -40,7 +40,7 @@
   -rw-rw-r--. 1 student student 469023 Nov 14 05:04 jmx_prometheus_javaagent-0.16.1.redhat-00001.jar
   ```
 ### JMX Zookeeper
-* create zookeeper prometheus config file such as [zookeeper.yml](kafka/config/zookeeper.yml) and save file in /kafka/config of zookeeper server node.
+* create zookeeper prometheus config file such as [zookeeper.yml](kafka/config/zookeeper.yml) and save file in ~/amq-streams-2022/4-management/kafka/config of zookeeper server node.
   ```yml
   lowercaseOutputName: true
   lowercaseOutputLabelNames: true
@@ -58,7 +58,7 @@
     member_type: "$3"
   ...
   ```
-* for zookeeper, edit /bin/zookeeper-server-start.sh by add config to load jmxagent jar file and set configuration to file zookeeper.yml in previous step such as
+* for zookeeper, edit ~/amq-streams-2022/4-management/kafka/bin/zookeeper-server-start.sh by add config to load jmxagent jar file and set configuration to file zookeeper.yml in previous step such as
   ```bash
   #add below command for start jmx exporter at port 7075
   #set path to zookeeper.yml
@@ -69,9 +69,45 @@
 * start zookeeper
   ```bash
   cd ~/amq-streams-2022/4-management
+  ./kafka/bin/zookeeper-server-start.sh ./kafka/config/zookeeper.properties
   ```
-* check port 7075 start with command
-
+* check port 7075 start with command, open new terminal
+  ```bash
+  netstat -tnlp
+  ```
+  example result
+  ```bash
+  ...
+  tcp6       0      0 :::7075                 :::*                    LISTEN      16617/java
+  ...
+  ```
+* call with brower to http://localhost:7075/metrics for check metrics work!
+  ```bash
+  curl http://localhost:7075/metrics
+  ```
+  example result
+  ```bash
+  ...
+  # TYPE jmx_exporter_build_info gauge
+  jmx_exporter_build_info{version="0.16.1.redhat-00001",name="jmx_prometheus_javaagent",} 1.0
+  # HELP jmx_config_reload_failure_created Number of times configuration have failed to be reloaded.
+  # TYPE jmx_config_reload_failure_created gauge
+  jmx_config_reload_failure_created 1.668411562813E9
+  # HELP jmx_config_reload_success_created Number of times configuration have successfully been reloaded.
+  # TYPE jmx_config_reload_success_created gauge
+  jmx_config_reload_success_created 1.668411562812E9
+  # HELP jvm_memory_pool_allocated_bytes_created Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
+  # TYPE jvm_memory_pool_allocated_bytes_created gauge
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.668411563609E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.668411563616E9
+  ```
+  
 ### JMX Kafka
 * create kafka broker prometheus config file such as [kafka_broker.yml](kafka/config/kafka_broker.yml) and save file in /kafka/config of kafka broker node.
   ```yml
@@ -92,4 +128,53 @@
         topic: "$4"
         partition: "$5"
   ...
+  ```
+* for kafka broker, edit ~/amq-streams-2022/4-management/kafka/bin/kafka-server-start.sh by add config to load jmxagent jar file and set configuration to file kafka_broker.yml in previous step such as
+  ```bash
+  #add below command for start jmx exporter at port 7076
+  #set path to kafka_broker.yml
+  export KAFKA_OPTS=$KAFKA_OPTS' -javaagent:/home/student/amq-streams-2022/4-management/kafka/libs/jmx_prometheus_javaagent-0.16.1.redhat-00001.jar=7076:/home/student/amq-streams-2022/4-management/kafka/config/kafka_broker.yml'
+
+  exec $base_dir/kafka-run-class.sh $EXTRA_ARGS kafka.Kafka "$@"
+  ```
+* start kafka broker
+  ```bash
+  cd ~/amq-streams-2022/4-management
+  ./kafka/bin/kafka-server-start.sh ./kafka/config/server.properties
+  ```
+* check port 7076 start with command, open new terminal
+  ```bash
+  netstat -tnlp
+  ```
+  example result
+  ```bash
+  ...
+  tcp6       0      0 :::7075                 :::*                    LISTEN      16617/java
+  ...
+  ```
+* call with brower to http://localhost:7076/metrics for check metrics work!
+  ```bash
+  curl http://localhost:7076/metrics
+  ```
+  example result
+  ```bash
+  ...
+  # TYPE jmx_exporter_build_info gauge
+  jmx_exporter_build_info{version="0.16.1.redhat-00001",name="jmx_prometheus_javaagent",} 1.0
+  # HELP jmx_config_reload_failure_created Number of times configuration have failed to be reloaded.
+  # TYPE jmx_config_reload_failure_created gauge
+  jmx_config_reload_failure_created 1.668411562813E9
+  # HELP jmx_config_reload_success_created Number of times configuration have successfully been reloaded.
+  # TYPE jmx_config_reload_success_created gauge
+  jmx_config_reload_success_created 1.668411562812E9
+  # HELP jvm_memory_pool_allocated_bytes_created Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
+  # TYPE jvm_memory_pool_allocated_bytes_created gauge
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.668411563609E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.668411563616E9
   ```

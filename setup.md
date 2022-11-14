@@ -5,11 +5,11 @@ Following below instruction for prepare lab environment:
 <!-- TOC -->
 
 - [Setup Red Hat AMQ Streams Lab](#setup-red-hat-amq-streams-lab)
-    - [Prepare Lab Instructor Task, for RHPDS only](#prepare-lab-instructor-task-for-rhpds-only)
-    - [Connect to RHPDS VM Lab](#connect-to-rhpds-vm-lab)
-    - [Prerequisite Hardware](#prerequisite-hardware)
-    - [Prerequisite Software](#prerequisite-software)
-    - [Clone Lab Resource from Git](#clone-lab-resource-from-git)
+  - [Prepare Lab (Instructor Task, for RHPDS only)](#prepare-lab-instructor-task-for-rhpds-only)
+  - [Connect to RHPDS VM Lab](#connect-to-rhpds-vm-lab)
+  - [Prerequisite Hardware](#prerequisite-hardware)
+  - [Prerequisite Software](#prerequisite-software)
+  - [Clone Lab Resource from Git](#clone-lab-resource-from-git)
 
 <!-- /TOC -->
 
@@ -85,6 +85,7 @@ Following below instruction for prepare lab environment:
   sudo yum install -y wget
   sudo yum install -y nc
   sudo yum install -y tmux
+  sudo yum install -y net-tools
   ```
   
 * install cfssl, cfssljson (CloudFlare's PKI/TLS toolkit) for generate/managed ssl

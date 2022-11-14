@@ -41,4 +41,7 @@ case $COMMAND in
     ;;
 esac
 
+#add below command for start jmx exporter at port 7076
+#set path to kafka_broker.yml
+export KAFKA_OPTS=$KAFKA_OPTS' -javaagent:/home/student/amq-streams-2022/4-management/kafka/libs/jmx_prometheus_javaagent-0.16.1.redhat-00001.jar=7076:/home/student/amq-streams-2022/4-management/kafka/config/kafka_broker.yml'
 exec $base_dir/kafka-run-class.sh $EXTRA_ARGS kafka.Kafka "$@"
