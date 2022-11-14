@@ -9,7 +9,7 @@
     - [JMX Zookeeper](#jmx-zookeeper)
     - [JMX Kafka](#jmx-kafka)
   - [Kafka Exporter](#kafka-exporter)
-    - [JMX Library](#jmx-library-1)
+    - [](#)
 
 <!-- /TOC -->
 
@@ -177,4 +177,4 @@
 
 ## Kafka Exporter
 
-### JMX Library
+### 
