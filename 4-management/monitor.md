@@ -8,6 +8,8 @@
     - [JMX Library](#jmx-library)
     - [JMX Zookeeper](#jmx-zookeeper)
     - [JMX Kafka](#jmx-kafka)
+  - [Kafka Exporter](#kafka-exporter)
+    - [JMX Library](#jmx-library-1)
 
 <!-- /TOC -->
 
@@ -149,7 +151,7 @@
   example result
   ```bash
   ...
-  tcp6       0      0 :::7075                 :::*                    LISTEN      16617/java
+  tcp6       0      0 :::7076                 :::*                    LISTEN      16617/java
   ...
   ```
 * call with brower to http://localhost:7076/metrics for check metrics work!
@@ -159,22 +161,20 @@
   example result
   ```bash
   ...
-  # TYPE jmx_exporter_build_info gauge
-  jmx_exporter_build_info{version="0.16.1.redhat-00001",name="jmx_prometheus_javaagent",} 1.0
-  # HELP jmx_config_reload_failure_created Number of times configuration have failed to be reloaded.
-  # TYPE jmx_config_reload_failure_created gauge
-  jmx_config_reload_failure_created 1.668411562813E9
-  # HELP jmx_config_reload_success_created Number of times configuration have successfully been reloaded.
   # TYPE jmx_config_reload_success_created gauge
-  jmx_config_reload_success_created 1.668411562812E9
+  jmx_config_reload_success_created 1.668413540288E9
   # HELP jvm_memory_pool_allocated_bytes_created Total bytes allocated in a given JVM memory pool. Only updated after GC, not continuously.
   # TYPE jvm_memory_pool_allocated_bytes_created gauge
-  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.668411563609E9
-  jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.668411563616E9
-  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.668411563616E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'profiled nmethods'",} 1.668413541537E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Old Gen",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Eden Space",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-profiled nmethods'",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="G1 Survivor Space",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="Compressed Class Space",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="Metaspace",} 1.66841354154E9
+  jvm_memory_pool_allocated_bytes_created{pool="CodeHeap 'non-nmethods'",} 1.66841354154E9
   ```
+
+## Kafka Exporter
+
+### JMX Library
