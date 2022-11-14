@@ -41,4 +41,5 @@ case $COMMAND in
      ;;
 esac
 
+export EXTRA_ARGS=$EXTRA_ARGS' -javaagent:/home/student/amq-streams-2022/4-management/kafka/libs/jmx_prometheus_javaagent-0.16.1.redhat-00001.jar=7075:/home/student/amq-streams-2022/4-management/kafka/config/zookeeper.yml'
 exec $base_dir/kafka-run-class.sh $EXTRA_ARGS org.apache.zookeeper.server.quorum.QuorumPeerMain "$@"

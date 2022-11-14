@@ -5,6 +5,9 @@
 - [Monitor Red Hat AMQ Streams](#monitor-red-hat-amq-streams)
   - [Prerequisite](#prerequisite)
   - [JMX Exporter](#jmx-exporter)
+    - [JMX Library](#jmx-library)
+    - [JMX Zookeeper](#jmx-zookeeper)
+    - [JMX Kafka](#jmx-kafka)
 
 <!-- /TOC -->
 
@@ -26,6 +29,7 @@
  
 ## JMX Exporter
 
+### JMX Library
 * verify jmx libraries in /libs path such as jmx_prometheus_javaagent-xxxx.redhat-xxx.jar
   ```bash
   cd ~/amq-streams-2022/4-management/kafka/libs
@@ -35,7 +39,7 @@
   ```bash
   -rw-rw-r--. 1 student student 469023 Nov 14 05:04 jmx_prometheus_javaagent-0.16.1.redhat-00001.jar
   ```
-
+### JMX Zookeeper
 * create zookeeper prometheus config file such as [zookeeper.yml](kafka/config/zookeeper.yml) and save file in /kafka/config of zookeeper server node.
   ```yml
   lowercaseOutputName: true
@@ -62,7 +66,13 @@
 
   exec $base_dir/kafka-run-class.sh $EXTRA_ARGS org.apache.zookeeper.server.quorum.QuorumPeerMain "$@"
   ```
+* start zookeeper
+  ```bash
+  cd ~/amq-streams-2022/4-management
+  ```
+* check port 7075 start with command
 
+### JMX Kafka
 * create kafka broker prometheus config file such as [kafka_broker.yml](kafka/config/kafka_broker.yml) and save file in /kafka/config of kafka broker node.
   ```yml
   ...
