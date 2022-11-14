@@ -6,3 +6,4 @@
 - [Setup Red Hat AMQ Streams Lab](setup.md)
 - [Introduction to Red Hat AMQ Streams](./1-introduction-amq-streams/intro.md)
 - [Red Hat AMQ Streams Architecture](./2-amq-streams-architecture/architecture.md)
+- [Reassign Partition](./4-management/reassign.md)
