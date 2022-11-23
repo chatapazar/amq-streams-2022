@@ -9,7 +9,8 @@
     - [JMX Zookeeper](#jmx-zookeeper)
     - [JMX Kafka](#jmx-kafka)
   - [Kafka Exporter](#kafka-exporter)
-    - [](#)
+    - [Prepare Topic Data](#prepare-topic-data)
+    - [Run Kafka Exporter](#run-kafka-exporter)
 
 <!-- /TOC -->
 
@@ -83,7 +84,7 @@
   tcp6       0      0 :::7075                 :::*                    LISTEN      16617/java
   ...
   ```
-* call with brower to http://localhost:7075/metrics for check metrics work!
+* call curl to http://localhost:7075/metrics for check metrics work!
   ```bash
   curl http://localhost:7075/metrics
   ```
@@ -154,7 +155,7 @@
   tcp6       0      0 :::7076                 :::*                    LISTEN      16617/java
   ...
   ```
-* call with brower to http://localhost:7076/metrics for check metrics work!
+* call curl to http://localhost:7076/metrics for check metrics work!
   ```bash
   curl http://localhost:7076/metrics
   ```
@@ -177,4 +178,113 @@
 
 ## Kafka Exporter
 
-### 
+### Prepare Topic Data
+* List the topics using Kafka, open new terminal and run command
+  ```bash
+  cd ~/amq-streams-2022/4-management
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  ```
+* no topic show in terminal
+* create sample new topic which we will use
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic my-topic --partitions 3 --replication-factor 1
+  ```
+  result of create topic command
+  ```bash
+  Created topic my-topic.
+  ```
+* List the topics again to see it was created.
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  ```
+* Describe the topic to see more details:
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --topic my-topic --describe
+  ```
+* start consumer, open new terminal and run command
+  ```bash
+  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic my-topic --from-beginning --group monitor
+  ```
+* Start the console producer for create and send message to topic
+  ```bash
+  ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic
+  ```
+* Wait until it is ready (it should show `>`). and send 3 messages.
+  ```bash
+  >a
+  >b
+  >c
+  >
+* stop consumer console by type ctrl+c
+* back to producer console and submit 3 more data
+  ```bash
+  >a
+  >b
+  >c
+  >d
+  >e
+  >f
+  >
+  ``` 
+* stop producer console 
+* List the topics again to see '__consumer_offsets' was created.
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  ```
+  example result
+  ```bash
+  __consumer_offsets
+  my-topic
+  ```
+* monitor consumer groups:
+  ```bash
+  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --list
+  ```
+* and describe them: see current-offset, last-offset, lag
+
+  ```bash
+  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --describe
+  ```
+  example result
+  ```bash
+  Consumer group 'monitor' has no active members.
+
+  GROUP           TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+  monitor         my-topic        0          1               3               2               -               -               -
+  monitor         my-topic        1          1               1               0               -               -               -
+  monitor         my-topic        2          1               2               1               -               -               -
+  ```
+
+### Run Kafka Exporter
+* run kafka exporter
+  ```bash
+  cd ~/amq-streams-2022/4-management
+  ./kafka/bin/kafka_exporter --kafka.version=3.2.3 --kafka.server=localhost:9092
+  ```
+  example result
+  ```bash
+  I1114 09:30:43.593105   74303 kafka_exporter.go:792] Starting kafka_exporter (version=1.6.0, branch=HEAD, revision=c021e94dfb808e642d41064c6550cbba87fe30c6)
+  I1114 09:30:43.601413   74303 kafka_exporter.go:963] Listening on HTTP :9308
+  ```
+* call curl to http://localhost:9308/metrics for check metrics work!
+  ```bash
+  ...
+  # TYPE kafka_consumergroup_lag_sum gauge
+  kafka_consumergroup_lag_sum{consumergroup="monitor",topic="my-topic"} 3
+  ...
+  # TYPE kafka_topic_partition_current_offset gauge
+  kafka_topic_partition_current_offset{partition="0",topic="__consumer_offsets"} 0
+  kafka_topic_partition_current_offset{partition="0",topic="my-topic"} 3
+  kafka_topic_partition_current_offset{partition="1",topic="__consumer_offsets"} 0
+  kafka_topic_partition_current_offset{partition="1",topic="my-topic"} 1
+  ...
+  kafka_topic_partition_current_offset{partition="2",topic="my-topic"} 2
+  ...
+  kafka_topic_partition_oldest_offset{partition="0",topic="__consumer_offsets"} 0
+  kafka_topic_partition_oldest_offset{partition="0",topic="my-topic"} 0
+  kafka_topic_partition_oldest_offset{partition="1",topic="__consumer_offsets"} 0
+  kafka_topic_partition_oldest_offset{partition="1",topic="my-topic"} 0
+  ...
+  kafka_topic_partitions{topic="my-topic"} 3
+  ...
+  ```

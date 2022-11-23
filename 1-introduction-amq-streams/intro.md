@@ -150,7 +150,6 @@ Basic Red Hat AMQ Streams:
 * List the topics again to see it was created.
   ```bash
   ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  my-topic
   ```
 * Describe the topic to see more details:
   ```bash
@@ -227,10 +226,10 @@ Basic Red Hat AMQ Streams:
 
 ## Stop Zookeeper & Kafka Broker
 
-* type ctrl + c in kafka terminal and zookeeper terminal or
 * run stop server command in another terminal
   ```bash 
   ./kafka/bin/kafka-server-stop.sh
   ./kafka/bin/zookeeper-server-stop.sh
   ```
+* or type ctrl + c in kafka terminal and zookeeper terminal
 * check with jps command again (if stop complete, kafka and QuorumPeerMain will disappear)

@@ -82,9 +82,9 @@ Following below instruction for prepare lab environment:
 
 * optional: install wget, nc, tmux (if you don't found it in RHEL VM)
   ```bash
+  sudo yum install -y tmux
   sudo yum install -y wget
   sudo yum install -y nc
-  sudo yum install -y tmux
   sudo yum install -y net-tools
   ```
   
