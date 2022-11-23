@@ -6,6 +6,7 @@
   - [Prerequisite](#prerequisite)
   - [Deploying the Cruise Control Metrics Reporter](#deploying-the-cruise-control-metrics-reporter)
   - [Prepare Test Topic](#prepare-test-topic)
+  - [Start Cruise Control](#start-cruise-control)
 
 <!-- /TOC -->
 
@@ -55,3 +56,37 @@
     ```
 
 ## Prepare Test Topic
+* Create topic "demo"
+
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --create --topic demo --partitions 3   --replication-factor 3
+  ```
+  example result
+  ```bash
+  Created topic demo.
+  ```
+* Check Topic Description
+
+## Start Cruise Control
+cd /opt/cruise-control/
+./kafka-cruise-control-start.sh config/cruisecontrol.properties <port_number>
+
+curl 'http://HOST:PORT/kafkacruisecontrol/state'
+
+Auto-created topics
+__CruiseControlMetrics
+__KafkaCruiseControlPartitionMetricSamples
+__KafkaCruiseControlModelTrainingSamples
+
+config/capacityJBOD.json
+
+Generating optimization proposals
+dryrun parameter to false (default true).
+curl -v -X POST 'cruise-control-server:9090/kafkacruisecontrol/add_broker?brokerid=2'
+Review the optimization proposal contained in the response.
+
+Approving an optimization proposal
+curl -v -X POST 'cruise-control-server:9090/kafkacruisecontrol/add_broker?dryrun=false&brokerid=3,4'
+
+Check the progress
+curl 'cruise-control-server:9090/kafkacruisecontrol/user_tasks'
