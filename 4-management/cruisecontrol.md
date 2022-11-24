@@ -8,6 +8,7 @@
   - [Prepare Test Topic](#prepare-test-topic)
   - [Enable Cruise Control](#enable-cruise-control)
   - [Test Auto Rebalance After Add Broker With Cruise-control](#test-auto-rebalance-after-add-broker-with-cruise-control)
+  - [Stop Server](#stop-server)
 
 <!-- /TOC -->
 
@@ -109,12 +110,14 @@
         Topic: demo     Partition: 9    Leader: 0       Replicas: 0,1   Isr: 0,1
   ```
 * load data to topic "demo"
+  ```bash
   ./kafka/bin/kafka-producer-perf-test.sh \
   --topic demo \
   --throughput -1 \
   --num-records 500000 \
   --record-size 2048 \
   --producer-props acks=all bootstrap.servers=localhost:9092,localhost:9093
+  ```
 
 * run start kafka broker 2 in different terminal
     ```bash
@@ -169,6 +172,18 @@
   cd ~/amq-streams-2022/4-management/cruise-control
   ./kafka-cruise-control-start.sh config/cruisecontrol.properties 9191
   ```
+* check Auto-created topics of cruise-control
+  ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list --exclude-internal
+  ```
+  example result, show new topic such as "__CruiseControlMetrics", "__KafkaCruiseControlPartitionMetricSamples" and "__KafkaCruiseControlModelTrainingSamples"
+  ```bash
+  __CruiseControlMetrics
+  __KafkaCruiseControlModelTrainingSamples
+  __KafkaCruiseControlPartitionMetricSamples
+  demo
+  ```
 * open new terminal, check cruise-control state
   ```bash
   curl 'http://localhost:9191/kafkacruisecontrol/state'
@@ -181,18 +196,6 @@
   AnalyzerState: {isProposalReady: false, readyGoals: []}
   AnomalyDetectorState: {selfHealingEnabled:[], selfHealingDisabled:[DISK_FAILURE, BROKER_FAILURE, GOAL_VIOLATION, METRIC_ANOMALY, TOPIC_ANOMALY, MAINTENANCE_EVENT], selfHealingEnabledRatio:{DISK_FAILURE=0.0, BROKER_FAILURE=0.0, GOAL_VIOLATION=0.0, METRIC_ANOMALY=0.0, TOPIC_ANOMALY=0.0, MAINTENANCE_EVENT=0.0}, recentGoalViolations:[], recentBrokerFailures:[], recentMetricAnomalies:[], recentDiskFailures:[], recentTopicAnomalies:[], recentMaintenanceEvents:[], metrics:{meanTimeBetweenAnomalies:{GOAL_VIOLATION:0.00 milliseconds, BROKER_FAILURE:0.00 milliseconds, METRIC_ANOMALY:0.00 milliseconds, DISK_FAILURE:0.00 milliseconds, TOPIC_ANOMALY:0.00 milliseconds}, meanTimeToStartFix:0.00 milliseconds, numSelfHealingStarted:0, numSelfHealingFailedToStart:0, ongoingAnomalyDuration=0.00 milliseconds}, ongoingSelfHealingAnomaly:None, balancednessScore:100.000}
 
-  ```
-* check Auto-created topics of cruise-control
-  ```bash
-  cd ~/amq-streams-2022/2-amq-streams-architecture/
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list --exclude-internal
-  ```
-  example result, show new topic such as "__CruiseControlMetrics", "__KafkaCruiseControlPartitionMetricSamples" and "__KafkaCruiseControlModelTrainingSamples"
-  ```bash
-  __CruiseControlMetrics
-  __KafkaCruiseControlModelTrainingSamples
-  __KafkaCruiseControlPartitionMetricSamples
-  demo
   ```
 * review capacity limits for Kafka broker resources in [config/config/capacityJBOD.json](./cruise-control/config/capacityJBOD.json) 
 config/capacityJBOD.json, To apply the same capacity limits to every broker monitored by Cruise Control, set capacity limits for broker ID -1. To set different capacity limits for individual brokers, specify each broker ID and its capacity configuration.
@@ -222,13 +225,185 @@ config/capacityJBOD.json, To apply the same capacity limits to every broker moni
     ]
   }
   ```
+
 ## Test Auto Rebalance After Add Broker With Cruise-control
 * Test Generating optimization proposals with dryrun.
-curl -v -X POST 'localhost:9191/kafkacruisecontrol/add_broker?brokerid=2'
-Review the optimization proposal contained in the response.
+  ```bash
+  curl -v -X POST 'localhost:9191/kafkacruisecontrol/add_broker?brokerid=2'
+  ```
+  example result, Review the optimization proposal contained in the response.
+  ```bash
+  *   Trying ::1...
+  * TCP_NODELAY set
+  * Connected to localhost (::1) port 9191 (#0)
+  > POST /kafkacruisecontrol/add_broker?brokerid=2 HTTP/1.1
+  > Host: localhost:9191
+  > User-Agent: curl/7.61.1
+  > Accept: */*
+  >
+  < HTTP/1.1 200 OK
+  < Date: Thu, 24 Nov 2022 06:17:17 GMT
+  < Set-Cookie: JSESSIONID=node0vavr3i7abj7ilf5myhd9ixsb8.node0; Path=/
+  < Expires: Thu, 01 Jan 1970 00:00:00 GMT
+  < User-Task-ID: 01d01442-230e-4f39-9514-5355239f99e1
+  < Content-Type: text/plain;charset=utf-8
+  < Cruise-Control-Version: 2.5.89.redhat-00006
+  < Cruise-Control-Commit_Id: 1e4e2dd8f14df6c409244c11c84c52038597ca99
+  < Content-Length: 13200
+  < Server: Jetty(9.4.45.v20220203-redhat-00001)
+  <
 
-Approving an optimization proposal
-curl -v -X POST 'localhost:9191/kafkacruisecontrol/add_broker?dryrun=false&brokerid=2'
 
-Check the progress
-curl 'localhost:9191/kafkacruisecontrol/user_tasks'
+  Optimization has 9 inter-broker replica(593 MB) moves, 0 intra-broker replica(0 MB) moves and 0 leadership moves with a cluster model of 1 recent windows and 100.000% of the partitions covered.
+  Excluded Topics: [].
+  Excluded Brokers For Leadership: [].
+  Excluded Brokers For Replica Move: [].
+  Counts: 3 brokers 149 replicas 4 topics.
+  On-demand Balancedness Score Before (86.026) After(92.120).
+  Provision Status: RIGHT_SIZED.
+
+  [     2 ms] Stats for ReplicaCapacityGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:53 leaderReplicas:27 topicReplicas:22}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:43 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:4.714045207910317 leaderReplicas:2.1602468994692865 topicReplicas:1.532064692570853
+
+  [     2 ms] Stats for DiskCapacityGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:53 leaderReplicas:27 topicReplicas:22}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:43 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:4.714045207910317 leaderReplicas:2.1602468994692865 topicReplicas:1.532064692570853
+
+  [     2 ms] Stats for NetworkInboundCapacityGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:53 leaderReplicas:27 topicReplicas:22}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:43 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:4.714045207910317 leaderReplicas:2.1602468994692865 topicReplicas:1.532064692570853
+
+  [     1 ms] Stats for NetworkOutboundCapacityGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:53 leaderReplicas:27 topicReplicas:22}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:43 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:4.714045207910317 leaderReplicas:2.1602468994692865 topicReplicas:1.532064692570853
+
+  [     1 ms] Stats for CpuCapacityGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:53 leaderReplicas:27 topicReplicas:22}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:43 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:4.714045207910317 leaderReplicas:2.1602468994692865 topicReplicas:1.532064692570853
+
+  [     3 ms] Stats for ReplicaDistributionGoal(FIXED):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:45 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:3.2998316455372216 leaderReplicas:2.1602468994692865 topicReplicas:1.8438694748020148
+
+  [     1 ms] Stats for PotentialNwOutGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     985.028 potentialNwOut:     556.011 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:       0.000 potentialNwOut:       0.000 replicas:45 leaderReplicas:22 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:     464.343 potentialNwOut:     262.106 replicas:3.2998316455372216 leaderReplicas:2.1602468994692865 topicReplicas:1.8438694748020148
+
+  [     5 ms] Stats for DiskUsageDistributionGoal(VIOLATED):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [     1 ms] Stats for NetworkInboundUsageDistributionGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [     1 ms] Stats for NetworkOutboundUsageDistributionGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [     2 ms] Stats for CpuUsageDistributionGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [     1 ms] Stats for TopicReplicaDistributionGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [     1 ms] Stats for LeaderReplicaDistributionGoal(NO-ACTION):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  [    11 ms] Stats for LeaderBytesInDistributionGoal(VIOLATED):
+  AVG:{cpu:       0.000 networkInbound:     370.684 networkOutbound:     185.337 disk:     656.680 potentialNwOut:     370.674 replicas:49.666666666666664 leaderReplicas:25.0 topicReplicas:12.416666666666666}
+  MAX:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     687.773 potentialNwOut:     403.316 replicas:52 leaderReplicas:27 topicReplicas:23}
+  MIN:{cpu:       0.000 networkInbound:    1112.053 networkOutbound:     556.011 disk:     595.351 potentialNwOut:     333.606 replicas:48 leaderReplicas:23 topicReplicas:0}
+  STD:{cpu:       0.000 networkInbound:       0.000 networkOutbound:       0.000 disk:      43.368 potentialNwOut:      28.630 replicas:1.699673171197595 leaderReplicas:1.632993161855452 topicReplicas:0.7832093030221935
+
+  Cluster load after adding broker [2]:
+
+
+       HOST         BROKER      RACK         DISK_CAP(MB)            DISK(MB)/_(%)_            CORE_NUM         CPU(%)          NW_IN_CAP(KB/s)       LEADER_NW_IN(KB/s)     FOLLOWER_NW_IN(KB/s)         NW_OUT_CAP(KB/s)        NW_OUT(KB/s)       PNW_OUT(KB/s)    LEADERS/REPLICAS
+  localhost,             0,localhost,           10000.000,            686.917/06.87,                  1,         0.000,               10000.000,                 209.129,                 165.970,               10000.000,            209.129,            375.099,            23/48
+  localhost,             1,localhost,           10000.000,            687.773/06.88,                  1,         0.000,               10000.000,                 124.477,                 278.839,               10000.000,            124.477,            403.316,            25/49
+  localhost,             2,localhost,           10000.000,            595.351/05.95,                  1,         0.000,               10000.000,                 222.436,                 111.202,               10000.000,            222.404,            333.606,            27/52
+  * Connection #0 to host localhost left intact
+  ```
+
+* Approving an optimization proposal
+  ```bash
+  curl -v -X POST 'localhost:9191/kafkacruisecontrol/add_broker?dryrun=false&brokerid=2'
+  ```
+* Check progress
+  ```bash
+  curl 'localhost:9191/kafkacruisecontrol/user_tasks'
+  ```  
+  example result
+  ```bash
+  USER TASK ID                          CLIENT ADDRESS        START TIME            STATUS       REQUEST URL
+  081d2454-5c1c-4c9f-be3c-90d282fdf0fe  [0:0:0:0:0:0:0:1]     2022-11-24T06:20:30Z  InExecution  POST /kafkacruisecontrol/add_broker?brokerid=2&dryrun=false
+  7bb50955-f9e5-45e6-bb6b-6177d2b3dc8e  [0:0:0:0:0:0:0:1]     2022-11-24T06:13:33Z  Completed    GET /kafkacruisecontrol/state
+  5c0d11d0-0b98-431b-965d-f030e3263835  [0:0:0:0:0:0:0:1]     2022-11-24T06:13:38Z  Completed    GET /kafkacruisecontrol/state
+  ```
+  call check until status change to Completed
+  ```bash
+  USER TASK ID                          CLIENT ADDRESS        START TIME            STATUS      REQUEST URL
+  7bb50955-f9e5-45e6-bb6b-6177d2b3dc8e  [0:0:0:0:0:0:0:1]     2022-11-24T06:13:33Z  Completed   GET /kafkacruisecontrol/state
+  ...
+  081d2454-5c1c-4c9f-be3c-90d282fdf0fe  [0:0:0:0:0:0:0:1]     2022-11-24T06:20:30Z  Completed   POST /kafkacruisecontrol/add_broker?brokerid=2&dryrun=false
+  ```
+* Check Topic after call cruise-control/add_broker, some partition move to new broker
+
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic demo
+  ```
+  example result, show partition of demo topic in broker 0,broker 1 and broker 2
+  ```bash
+  Topic: demo     TopicId: Z5cEJOZdQ_iUsuzXOWvdfw PartitionCount: 10      ReplicationFactor: 2    Configs: segment.bytes=104857600
+        Topic: demo     Partition: 0    Leader: 2       Replicas: 2,0   Isr: 0,2
+        Topic: demo     Partition: 1    Leader: 2       Replicas: 2,1   Isr: 1,2
+        Topic: demo     Partition: 2    Leader: 1       Replicas: 1,0   Isr: 1,0
+        Topic: demo     Partition: 3    Leader: 2       Replicas: 2,1   Isr: 1,2
+        Topic: demo     Partition: 4    Leader: 2       Replicas: 2,0   Isr: 0,2
+        Topic: demo     Partition: 5    Leader: 0       Replicas: 0,1   Isr: 0,1
+        Topic: demo     Partition: 6    Leader: 1       Replicas: 1,2   Isr: 1,2
+        Topic: demo     Partition: 7    Leader: 0       Replicas: 0,1   Isr: 0,1
+        Topic: demo     Partition: 8    Leader: 1       Replicas: 1,0   Isr: 1,0
+        Topic: demo     Partition: 9    Leader: 0       Replicas: 0,2   Isr: 0,2
+  ```
+
+## Stop Server
+* stop cruise-control
+  ```bash
+  cd ~/amq-streams-2022/4-management/cruise-control
+  ./kafka-cruise-control-stop.sh config/cruisecontrol.properties 9191
+  ```
+* stop kafka broker in each terminal with ctrl+c
+* stop zookeeper in each terminal with ctrl+c
+
