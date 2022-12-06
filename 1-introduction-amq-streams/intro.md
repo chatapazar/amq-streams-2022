@@ -10,7 +10,7 @@ Basic Red Hat AMQ Streams:
   - [Basic Start Kafka Broker](#basic-start-kafka-broker)
   - [Basic Create Kafka Topic](#basic-create-kafka-topic)
   - [Basic Consuming and producing messages](#basic-consuming-and-producing-messages)
-  - [Stop Zookeeper & Kafka Broker](#stop-zookeeper--kafka-broker)
+  - [Stop Zookeeper \& Kafka Broker](#stop-zookeeper--kafka-broker)
 
 <!-- /TOC -->
 
@@ -24,11 +24,21 @@ Basic Red Hat AMQ Streams:
   ```bash
   cd ~/amq-streams-2022/1-introduction-amq-streams
   ```
-* First before we start Kafka, we have to start ZooKeeper, start zookeeper with command line (For testing, we start only 1 server.)
+* see detail of amq streams installation folder (you can install amq streams by download zip file from [red hat](https://access.redhat.com/jbossnetwork/restricted/listSoftware.html?downloadType=distributions&product=jboss.amq.streams) and unzip to your path )
   ```bash
-  ./kafka/bin/zookeeper-server-start.sh ./kafka/config/zookeeper.properties
+  tree -L 1 kafka
   ```
-* review [zookkeper.properties](kafka/config/zookeeper.properties), see detail of zookeeper configuration
+  example result
+  ```bash
+  kafka
+  ├── LICENSE  
+  ├── NOTICE
+  ├── bin         --> kafka command line folder
+  ├── config      --> kafka configuration folder
+  ├── libs        --> kafka java libraries folder
+  └── licenses
+  ```
+* review [zookkeper.properties](kafka/config/zookeeper.properties) in kafka/config, see detail of zookeeper configuration. we will use this file for config zookeeper.
   ```properties
   # the directory where the snapshot is stored.
   dataDir=/tmp/zookeeper
@@ -41,7 +51,10 @@ Basic Red Hat AMQ Streams:
   admin.enableServer=false
   # admin.serverPort=8080
   ```
-
+* First before we start Kafka, we have to start ZooKeeper, start zookeeper with command line (For testing, we start only 1 server.)
+  ```bash
+  ./kafka/bin/zookeeper-server-start.sh ./kafka/config/zookeeper.properties
+  ```
 * wait until zookeeper start complete
   ```bash
   ...
@@ -53,12 +66,7 @@ Basic Red Hat AMQ Streams:
 
 ## Basic Start Kafka Broker
 
-* Next we can start Kafka Broker, open new terminal by repeat step in [Connect to RHPDS VM Lab](./../setup.md#connect-to-rhpds-vm-lab) and run command (For testing, we start only 1 server.)
-  ```
-  cd ~/amq-streams-2022/1-introduction-amq-streams
-  ./kafka/bin/kafka-server-start.sh ./kafka/config/server.properties
-  ```
-* review [server.properties](kafka/config/server.properties), see detail of server configuration
+* review [server.properties](kafka/config/server.properties) in kafka/config, see detail of server configuration. we will use this file for start kafka.
   ```properties
   ...
   # The id of the broker. This must be set to a unique integer for each broker.
@@ -118,6 +126,12 @@ Basic Red Hat AMQ Streams:
   zookeeper.connection.timeout.ms=18000  
   ...
   ```
+* Next we can start Kafka Broker, open new terminal by repeat step in [Connect to RHPDS VM Lab](./../setup.md#connect-to-rhpds-vm-lab) and run command (For testing, we start only 1 server.)
+  ```
+  cd ~/amq-streams-2022/1-introduction-amq-streams
+  ./kafka/bin/kafka-server-start.sh ./kafka/config/server.properties
+  ```
+
 * wait unti kafka start complete
   ```bash
   [2022-11-10 06:50:45,035] INFO [SocketServer listenerType=ZK_BROKER, nodeId=0] Started data-plane acceptor and processor(s) for endpoint : ListenerName(PLAINTEXT) (kafka.network.SocketServer)
@@ -130,8 +144,22 @@ Basic Red Hat AMQ Streams:
   [2022-11-10 06:50:45,238] INFO [BrokerToControllerChannelManager broker=0 name=forwarding]: Recorded new controller, from now on will use broker ip-192-168-0-124.us-east-2.compute.internal:9092 (id: 0 rack: null) (kafka.server.BrokerToControllerRequestThread)
   ```
 * kafka broker terminal
+  
   ![](../images/setup-4.png)
   
+* check zookeeper and kafka process 
+  ```bash
+  jps
+  ```
+  example result
+  ```bash
+  1749 QuorumPeerMain --> zookeeper process
+  6774 Jps
+  2319 Kafka          --> kafka process
+  ```
+  - process "QuorumPeerMain" is zookeeper
+  - process "Kafka" is kafka broker
+
 ## Basic Create Kafka Topic
 
 * List the topics using Kafka, open new terminal and run command
@@ -211,18 +239,7 @@ Basic Red Hat AMQ Streams:
   ```bash
   Consumer group 'console-consumer-16045' has no active members.
   ```
-* check zookeeper and java process 
-  ```bash
-  jps
-  ```
-  example result
-  ```bash
-  1749 QuorumPeerMain 
-  6774 Jps
-  2319 Kafka
-  ```
-  - process "QuorumPeerMain" is zookeeper
-  - process "Kafka" is kafka broker
+
 
 ## Stop Zookeeper & Kafka Broker
 
