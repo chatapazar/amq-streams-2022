@@ -20,17 +20,6 @@
     - [Consume messages](#consume-messages-1)
     - [Send some new messages](#send-some-new-messages)
     - [Start the broker 2 again](#start-the-broker-2-again)
-  - [Consumer Groups](#consumer-groups)
-    - [Create a new topic (delete and create new again)](#create-a-new-topic-delete-and-create-new-again)
-    - [Setup consumers](#setup-consumers)
-    - [Send messages](#send-messages)
-    - [Rebalancing consumer group](#rebalancing-consumer-group)
-    - [Message replay](#message-replay)
-  - [Secure Client to Broker Cluster](#secure-client-to-broker-cluster)
-    - [Configuration](#configuration)
-    - [SSL Consumers and Producers](#ssl-consumers-and-producers)
-    - [SASL Consumers and Producers](#sasl-consumers-and-producers)
-    - [Topics \& Partition Information](#topics--partition-information)
 
 <!-- /TOC -->
 
@@ -40,6 +29,9 @@
  
 ## Clean AMQ Streams Data
 
+* make sure to stop all kafka & zookeeper server
+  * by ctrl+c in your terminal or
+  * call kafka-server-stop.sh for kafka broker and call zookeeper-server-stop.sh for zookeeper
 * clear zookeeper & kafka data
   ```bash
   rm -rf /tmp/zookeeper*
@@ -53,7 +45,8 @@
   cd ~/amq-streams-2022/2-amq-streams-architecture/
   ./ssl/generate.sh
   ```
-* example result of generate.sh (path ~/amq-streams-2022/2-amq-streams-architecture/ssl/keys)
+* example result of generate.sh (path ~/amq-streams-2022/2-amq-streams-architecture/ssl/keys, don't worry about warning in result!). 
+* 
   ![](./../images/cluster-1.png)
   
 ## Start ZooKeeper cluster
@@ -80,6 +73,7 @@ Don't worry about error after run zookeeper-0.sh (error about QuorumPeer):
   ./scripts/zookeeper-2.sh
   ```
   example result
+  
   ![](./../images/cluster-2.png)
  
 ## Start Kafka cluster 
@@ -111,7 +105,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
 ### Show what Kafka does in Zookeeper
 
 * open new terminal
-* Find and notice the ZK JAR files in `./kafka/libs` and `./kafka/bin` - Zookeeper is integrated into Kafka distribution
+* Find and notice the ZK JAR files in `./kafka/libs` and `./kafka/bin` - Zookeeper is integrated into Kafka distribution (see in 2-amq-streams-architecture/)
 * Start the ZK client
   ```bash
   cd ~/amq-streams-2022/2-amq-streams-architecture/
@@ -128,6 +122,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ls /brokers/topics
   ```
   example result
+  
   ![](./../images/cluster-4.png)
 
 * Exit from zookeeper-shell with ctrl+c
@@ -166,7 +161,9 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ```
 
 * Kill broker 2 (type ctrl+c in kafka broker terminal #3) and do the netcat again to see how it disappeared
+  
   ![](./../images/cluster-5.png)  
+  
   ```bash
   echo dump | nc localhost 2181
   ```
@@ -203,6 +200,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
 ### Create topic
 
   ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
   ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --create --topic demo --partitions 3   --replication-factor 3
   ```
   example result
@@ -231,9 +229,11 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
 * Send at least 10 messages (e.g. `Message 1`, `Message 2` etc. to be able to notice the ordering later), exit command with ctrl+c
 
   ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
   ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic demo
   ```
   example result
+  
   ![](./../images/cluster-6.png)
 
 ### Consume messages
@@ -244,22 +244,25 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9093 --topic demo --from-beginning
   ```
   example result
+  
   ![](./../images/cluster-7.png)
 
-* Notice how the messages are out of order. And check how nicely ordered they are in a single partition.
+* Notice how the messages are out of order. And check how nicely ordered they are in a single partition. exit old console consumer and call it again and select only partition 0.
 
   ```bash
   ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --partition 0 --from-beginning
   ```
   example result
+  
   ![](./../images/cluster-8.png)
 
-* Reading from a particular offset
+* Reading from a particular offset (try to change partition and offset to test this command)
 
   ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --partition 0 --offset 2
+  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --partition 0 --offset 1
   ```
   example result
+  
   ![](./../images/cluster-9.png)
 
 ## Replication
@@ -269,6 +272,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
 * View topic description with the leaders  and new ISR
 
   ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
   ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe  --topic demo
   ```
   example result
@@ -280,7 +284,9 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ```
 
 * Kill broker 2 by ctrl+c in kafka terminal #2 (broker start with 0,1,2)
+  
   ![](./../images/cluster-10.png)
+  
 * Look again at the topic description with the leaders which changed and new ISR
 
   ```bash
@@ -299,9 +305,11 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
 * Try to consume the messages again to confirm that replication worked and that the messages are still in the topic!
 
   ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
   ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning
   ```
   example result
+  
   ![](./../images/cluster-11.png)
 
 ### Send some new messages
@@ -310,6 +318,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic demo
   ```
   example result
+  
   ![](./../images/cluster-12.png)
 
 ### Start the broker 2 again
@@ -326,211 +335,17 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ```
   example result (broker 2 comeback, but leader not change)
   ```bash
-  xTopic: demo     TopicId: YDf9yjTsTFqA2OPWtzJ4GQ PartitionCount: 3       ReplicationFactor: 3    Configs: segment.bytes=104857600
+  Topic: demo     TopicId: YDf9yjTsTFqA2OPWtzJ4GQ PartitionCount: 3       ReplicationFactor: 3    Configs: segment.bytes=104857600
         Topic: demo     Partition: 0    Leader: 1       Replicas: 1,2,0 Isr: 1,0,2
         Topic: demo     Partition: 1    Leader: 0       Replicas: 0,1,2 Isr: 0,1,2
         Topic: demo     Partition: 2    Leader: 0       Replicas: 2,0,1 Isr: 0,1,2
   ``` 
 
 * Leadership didn't changed, but all replicas are again ISR
-
-## Consumer Groups
-
-### Create a new topic (delete and create new again)
+* Try to consume the messages again.
 
   ```bash
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic demo
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic demo --partitions 3 --replication-factor 3
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic demo
-  ```
-
-### Setup consumers
-
-* Open 3 consumers using the same group `group-1`
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning --property print.key=true --property key.separator=":" --group group-1
-  ```
-  example result
-  ![](./../images/cluster-13.png)
-
-* Open consumer using a different group `group-2`
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning  --property print.key=true --property key.separator=":" --group group-2
-  ```
-  example result
-  ![](./../images/cluster-14.png)
-
-### Send messages
-
-* Send some messages with keys (Send messages in the format `key:payload` - e.g. `my-key:my-value`)
-
-  ```bash
-  ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic demo --property "parse.key=true" --property "key.separator=:"
-  ```
-  - example result
-  ![](./../images/cluster-15.png)
-  - example result after send message
-  ![](./../images/cluster-16.png)
-
-### Rebalancing consumer group
-
-* Kill one of the consumers started before 
-  - example kill consumer group-1 terminal #2
-  ![](./../images/cluster-17.png)
-* Send some messages with the same key as was used before for this consumer
-* Notice that one of the other consumers got the partition assigned and will receive it
-  - example result
-  ![](./../images/cluster-18.png)
-  
-### Message replay
-
-* kill all previous consumer
-* Consume the messages from Kafka with a new group:
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning  --property print.key=true --property key.separator=":" --group replay-group
-  ```
-  example result
-  ![](./../images/cluster-19.png)
-  
-* After it consumes all messages, try to restart it to make sure they were all committed - no messages should be received
-  
-  example result
-  ![](./../images/cluster-20.png)
-  
-* kill all consumer (with ctrl+c)
-* List all the groups:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --list
-  ```
-  example result
-  ![](./../images/cluster-21.png)
-
-* Or describe them:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --describe
-  ```
-  example result (view current-offset, log-end-offset, lag)
-  ![](./../images/cluster-22.png)
-
-* Go and reset the offset to 0: with --to-earliest (other option such as set to last offset with --to-latest)
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --to-earliest --group replay-group --topic demo --execute
-  ```
-  example result
-  ![](./../images/cluster-23.png)
-
-* Try to consume the messages again - you should receive them from the beginning of the topic:
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning  --property print.key=true --property key.separator=":" --group replay-group
-  ```
-  example result
-  ![](./../images/cluster-24.png)
-
-## Secure Client to Broker Cluster
-
-### Configuration
-
-* Look in the configuration files of the brokers (`./configs/kafka/`) such as [server-0.properties](./configs/kafka/server-0.properties) and check the fields related to the TLS & SASL.
-  - example configuration
-    ```properties
-    ############################# SASL #############################
-
-    sasl.enabled.mechanisms=PLAIN,SCRAM-SHA-256,SCRAM-SHA-512
-    sasl.mechanism.inter.broker.protocol=PLAIN
-
-    ############################# SSL #############################
-
-    # Configures kafka broker to request client authentication. The following settings are common:
-    #ssl.client.auth=required If set to required client authentication is required.
-    #ssl.client.auth=requested This means client authentication is optional. unlike requested , if this option is set client can choose not to provide authentication information about itself
-    #ssl.client.auth=none This means client authentication is not needed.
-    ssl.client.auth=required
-
-    # The location of the key store file. This is optional for client and can be used for two-way authentication for client.
-    ssl.keystore.location=./ssl/keys/server-0.keystore
-
-    # The store password for the key store file. This is optional for client and only needed if ssl.keystore.location is configured.
-    ssl.keystore.password=123456
-
-    # The location of the trust store file.
-    ssl.truststore.location=./ssl/keys/truststore
-
-    # The password for the trust store file. If a password is not set access to the truststore is still available, but integrity checking is disabled.
-    ssl.truststore.password=123456
-    ```
-
-### SSL Consumers and Producers
-
-* Use SSL to producer messages:
-
-  ```bash
-  ./kafka/bin/kafka-console-producer.sh --broker-list localhost:19092 \
-      --topic demo \
-      --producer-property security.protocol=SSL \
-      --producer-property ssl.truststore.password=123456 \
-      --producer-property ssl.truststore.location=./ssl/keys/truststore \
-      --producer-property ssl.keystore.password=123456 \
-      --producer-property ssl.keystore.location=./ssl/keys/user1.keystore
-  ```
-
-* And consume them:
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:19092 \
-      --topic demo --from-beginning \
-      --consumer-property security.protocol=SSL \
-      --consumer-property ssl.truststore.password=123456 \
-      --consumer-property ssl.truststore.location=./ssl/keys/truststore \
-      --consumer-property ssl.keystore.password=123456 \
-      --consumer-property ssl.keystore.location=./ssl/keys/user1.keystore
-  ```
-
-### SASL Consumers and Producers
-
-* Check the [sasl-client.properties](sasl-client.properties) file  which configures SASL PLAIN authentication 
-* Try to producer some messages:
-
-  ```bash
-  ./kafka/bin/kafka-console-producer.sh --broker-list localhost:39092 \
-      --topic demo \
-      --producer.config sasl-client.properties
-  ```
-
-* And consume them:
-
-  ```bash
-  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:39092 \
-      --topic demo --from-beginning \
-      --consumer.config sasl-client.properties
-  ```
-
-### Topics & Partition Information
-* check demo topic already in cluster
-  ```bash
-  cd ~/amq-streams-2022/4-management/
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  ```
-  example result
-  ```bash
-  __consumer_offsets
-  demo
-  ```
-* We already used a lot of commands. You can also use the script to show only some topics in _troubles_:
-  * '--under-replicated-partitions' --> displays the number of partitions that do not have enough replicas to meet the desired replication factor.
-  * '--unavailable-partitions' --> list partitions that currently don't have a leader and hence cannot be used by Consumers or Producers.
-
-  ```bash
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --under-replicated-partitions
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --unavailable-partitions
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
+  ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo --from-beginning
   ```
 

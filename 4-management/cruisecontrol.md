@@ -198,7 +198,7 @@
 
   ```
 * review capacity limits for Kafka broker resources in [config/config/capacityJBOD.json](./cruise-control/config/capacityJBOD.json) 
-config/capacityJBOD.json, To apply the same capacity limits to every broker monitored by Cruise Control, set capacity limits for broker ID -1. To set different capacity limits for individual brokers, specify each broker ID and its capacity configuration.
+, To apply the same capacity limits to every broker monitored by Cruise Control, set capacity limits for broker ID -1. To set different capacity limits for individual brokers, specify each broker ID and its capacity configuration.
   ```json
   {
     "brokerCapacities":[
@@ -355,6 +355,12 @@ config/capacityJBOD.json, To apply the same capacity limits to every broker moni
   localhost,             2,localhost,           10000.000,            595.351/05.95,                  1,         0.000,               10000.000,                 222.436,                 111.202,               10000.000,            222.404,            333.606,            27/52
   * Connection #0 to host localhost left intact
   ```
+* if your found error 500 after call proposals such as
+  ```bash
+  Error processing POST request '/add_broker' due to: 'com.linkedin.kafka.cruisecontrol.exception.KafkaCruiseControlException: com.linkedin.cruisecontrol.exception.NotEnoughValidWindowsException: There are only 0 valid windows when aggregating in range [-1, 1670319259389] for aggregation options (minValidEntityRatio=0.95, minValidEntityGroupRatio=0.00, minValidWindows=1, numEntitiesToInclude=75, granularity=ENTITY)'
+  ```
+
+  please wait and re try again because Cruise Control has not collect enough metric data to aggregate to a valid window. (around 2-3 minutes)
 
 * Approving an optimization proposal
   ```bash
@@ -381,6 +387,7 @@ config/capacityJBOD.json, To apply the same capacity limits to every broker moni
 * Check Topic after call cruise-control/add_broker, some partition move to new broker
 
   ```bash
+  cd ~/amq-streams-2022/4-management
   ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic demo
   ```
   example result, show partition of demo topic in broker 0,broker 1 and broker 2

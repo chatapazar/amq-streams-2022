@@ -147,7 +147,7 @@ Basic Red Hat AMQ Streams:
   
   ![](../images/setup-4.png)
   
-* check zookeeper and kafka process 
+* open new terminal and check zookeeper and kafka process
   ```bash
   jps
   ```
@@ -164,6 +164,7 @@ Basic Red Hat AMQ Streams:
 
 * List the topics using Kafka, open new terminal and run command
   ```bash
+  cd ~/amq-streams-2022/1-introduction-amq-streams
   ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
   ```
 * no topic show in terminal
@@ -195,11 +196,13 @@ Basic Red Hat AMQ Streams:
 
 * Start the console producer for create and send message to topic
   ```bash
+  cd ~/amq-streams-2022/1-introduction-amq-streams
   ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic
   ```
 * Wait until it is ready (it should show `>`).
 * Next we can consume the messages, open new terminal and run command
   ```bash
+  cd ~/amq-streams-2022/1-introduction-amq-streams
   ./kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic my-topic --from-beginning
   ```
 * Once ready, back to producer terminal and send some message by typing the message payload and pressing enter to send. such as
@@ -216,6 +219,7 @@ Basic Red Hat AMQ Streams:
   c
   ```
   example result in terminal
+  
   ![](../images/setup-5.png)
 
 * exit from producer console by type ctrl+c in producer console terminal
@@ -240,11 +244,11 @@ Basic Red Hat AMQ Streams:
   Consumer group 'console-consumer-16045' has no active members.
   ```
 
-
 ## Stop Zookeeper & Kafka Broker
 
 * run stop server command in another terminal
   ```bash 
+  cd ~/amq-streams-2022/1-introduction-amq-streams
   ./kafka/bin/kafka-server-stop.sh
   ./kafka/bin/zookeeper-server-stop.sh
   ```

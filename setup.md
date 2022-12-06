@@ -39,6 +39,13 @@ Following below instruction for prepare lab environment:
   Last login: Wed Nov  9 08:52:03 2022 from 171.96.89.23
   [student@bastion ~]$
   ```
+* Remark: for the first time to bastion, type "yes" to accept connection.
+  ```bash
+  The authenticity of host 'bastion.zb75d.sandbox2423.opentlc.com (3.139.121.191)' can't be established.
+  ED25519 key fingerprint is SHA256:ZTsaxQSeraZDbwBqsGWGZUPSDPnDFio1Yv3Pes40OTI.
+  This key is not known by any other names
+  Are you sure you want to continue connecting (yes/no/[fingerprint])?
+  ```
 * ssh to your node (receive node name from instructor)
   ```bash
   [student@bastion ~]$ ssh node1
@@ -83,12 +90,13 @@ Following below instruction for prepare lab environment:
   [student@node1 ~]$
   ```
 
-* check & install wget, nc, tmux (if you don't found it in RHEL VM)
+* check & install wget, nc, tmux, maven (if you don't found it in RHEL VM)
   ```bash
   sudo yum install -y tmux
   sudo yum install -y wget
   sudo yum install -y nc
   sudo yum install -y net-tools
+  sudo yum install -y maven
   ```
   
 * install cfssl, cfssljson (CloudFlare's PKI/TLS toolkit) for generate/managed ssl
@@ -109,6 +117,53 @@ Following below instruction for prepare lab environment:
     chmod +x cfssljson
     sudo mv cfssljson /usr/local/bin
     cfssljson -version
+    ```
+
+* set default java version to 11 (openjdk 8 come with maven install, you must change default to jdk 11)
+  * run command to change java version
+    ```bash
+    sudo alternatives --config java
+    ```
+    
+    example result, type selection number to select java 11 and enter
+    ```bash
+    There are 2 programs which provide 'java'.
+
+      Selection    Command
+    -----------------------------------------------
+    + 1           java-11-openjdk.x86_64 (/usr/lib/jvm/java-11-openjdk-11.0.17.0.8-2.el8_6.x86_64/bin/java)
+    *  2           java-1.8.0-openjdk.x86_64 (/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.352.b08-2.el8_6.x86_64/jre/bin/java)
+
+    Enter to keep the current selection[+], or type selection number: 1
+    ```
+    
+  * change javac version to 11
+    ```bash
+    sudo alternatives --config javac
+    ```
+
+    example result, type selection number to select java 11 and enter
+    ```bash
+    There are 2 programs which provide 'javac'.
+
+      Selection    Command
+    -----------------------------------------------
+    + 1           java-11-openjdk.x86_64 (/usr/lib/jvm/java-11-openjdk-11.0.17.0.8-2.el8_6.x86_64/bin/javac)
+    *  2           java-1.8.0-openjdk.x86_64 (/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.352.b08-2.el8_6.x86_64/bin/javac)
+
+    Enter to keep the current selection[+], or type selection number: 1
+    ```
+  * check java & javac version to 11
+    ```bash
+    java -version
+    openjdk version "11.0.17" 2022-10-18 LTS
+    OpenJDK Runtime Environment (Red_Hat-11.0.17.0.8-2.el8_6) (build 11.0.17+8-LTS)
+    OpenJDK 64-Bit Server VM (Red_Hat-11.0.17.0.8-2.el8_6) (build 11.0.17+8-LTS, mixed mode, sharing)
+    ```
+
+    ```bash
+    javac -version
+    javac 11.0.17
     ```
 
 ## Clone Lab Resource from Git
