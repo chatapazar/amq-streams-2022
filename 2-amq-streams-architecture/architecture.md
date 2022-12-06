@@ -30,6 +30,7 @@
     - [Configuration](#configuration)
     - [SSL Consumers and Producers](#ssl-consumers-and-producers)
     - [SASL Consumers and Producers](#sasl-consumers-and-producers)
+    - [Topics \& Partition Information](#topics--partition-information)
 
 <!-- /TOC -->
 
@@ -418,7 +419,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   example result (view current-offset, log-end-offset, lag)
   ![](./../images/cluster-22.png)
 
-* Go and reset the offset to 0:
+* Go and reset the offset to 0: with --to-earliest (other option such as set to last offset with --to-latest)
 
   ```bash
   ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --to-earliest --group replay-group --topic demo --execute
@@ -511,3 +512,25 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
       --topic demo --from-beginning \
       --consumer.config sasl-client.properties
   ```
+
+### Topics & Partition Information
+* check demo topic already in cluster
+  ```bash
+  cd ~/amq-streams-2022/4-management/
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+  ```
+  example result
+  ```bash
+  __consumer_offsets
+  demo
+  ```
+* We already used a lot of commands. You can also use the script to show only some topics in _troubles_:
+  * '--under-replicated-partitions' --> displays the number of partitions that do not have enough replicas to meet the desired replication factor.
+  * '--unavailable-partitions' --> list partitions that currently don't have a leader and hence cannot be used by Consumers or Producers.
+
+  ```bash
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --under-replicated-partitions
+  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --unavailable-partitions
+  ```
+

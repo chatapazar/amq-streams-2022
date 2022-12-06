@@ -5,8 +5,6 @@
 - [Reassign Partition](#reassign-partition)
   - [Prerequisite](#prerequisite)
   - [Start Cluster](#start-cluster)
-    - [Topics](#topics)
-    - [Consumer groups](#consumer-groups)
     - [Topic Reassignments](#topic-reassignments)
 
 <!-- /TOC -->
@@ -29,52 +27,6 @@
   ./scripts/kafka-2.sh
   ```
   
-### Topics
-* check demo topic already in cluster
-  ```bash
-  cd ~/amq-streams-2022/4-management/
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-  ```
-  example result
-  ```bash
-  __consumer_offsets
-  demo
-  ```
-* We already used a lot of commands. You can also use the script to show only some topics in _troubles_:
-  * '--under-replicated-partitions' --> displays the number of partitions that do not have enough replicas to meet the desired replication factor.
-  * '--unavailable-partitions' --> list partitions that currently don't have a leader and hence cannot be used by Consumers or Producers.
-
-  ```bash
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --under-replicated-partitions
-  ./kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --unavailable-partitions
-  ```
-
-### Consumer groups
-
-* `kafka-consumer-groups.sh` lets you manage and monitor consumer groups:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --list
-  ```
-
-* or describe them:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --all-groups --describe
-  ```
-
-* Reset the offset to 0:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --to-earliest --group replay-group --topic demo --execute
-  ```
-
-* Reset the offset to last message:
-
-  ```bash
-  ./kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --to-latest --group replay-group --topic demo --execute
-  ```
 
 ### Topic Reassignments
 

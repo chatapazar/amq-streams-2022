@@ -7,7 +7,6 @@ Following below instruction for prepare lab environment:
 - [Setup Red Hat AMQ Streams Lab](#setup-red-hat-amq-streams-lab)
   - [Prepare Lab (Instructor Task, for RHPDS only)](#prepare-lab-instructor-task-for-rhpds-only)
   - [Connect to RHPDS VM Lab](#connect-to-rhpds-vm-lab)
-  - [Prerequisite Hardware](#prerequisite-hardware)
   - [Prerequisite Software](#prerequisite-software)
   - [Clone Lab Resource from Git](#clone-lab-resource-from-git)
 
@@ -16,9 +15,16 @@ Following below instruction for prepare lab environment:
 ## Prepare Lab (Instructor Task, for RHPDS only)
 * base on RHPDS --> "The Definitive RHEL8 Hands-On Lab"
 * after success request lab go to bookbag_url to run workshop setup, wait until complete all node.
+  
   ![](images/setup-1.png) 
 
 ## Connect to RHPDS VM Lab 
+* Get Lab Server Information from Instructor
+  - Lab Information URL: http://xxx.xxx/lab-amq
+  - ssh information to bastion such as ssh student@bastion.828xv.sandbox2440.opentlc.com
+  - bastion password : xxxxxx
+  - your lab node such as node1, node2 or node3
+* For Lab on RHPDS, connection flow is your terminal --> bastion --> lab server (node1, node2 or node 3)
 * open your terminal
 * run secure shell to bastion server (receive ssh command & password from instructor)
   ```bash
@@ -53,12 +59,9 @@ Following below instruction for prepare lab environment:
   ![](images/setup-2.png) 
 * Use the same method to open a new terminal.
   
-## Prerequisite Hardware
-* VM RHEL 8.x, CPU 2 vcpus, Memory 4 GB Ram, Disk 100 GB 
-
 ## Prerequisite Software
 * install openjdk 11
-  - install command
+  - install openjdk 11 command
     ```bash
     cd ~
     sudo yum install -y java-11-openjdk-devel  
@@ -80,7 +83,7 @@ Following below instruction for prepare lab environment:
   [student@node1 ~]$
   ```
 
-* optional: install wget, nc, tmux (if you don't found it in RHEL VM)
+* check & install wget, nc, tmux (if you don't found it in RHEL VM)
   ```bash
   sudo yum install -y tmux
   sudo yum install -y wget
@@ -101,6 +104,7 @@ Following below instruction for prepare lab environment:
     ```
   - install cfssljson command
     ```bash
+    cd ~
     wget https://github.com/cloudflare/cfssl/releases/download/${VERSION}/cfssljson_${VNUMBER}_linux_amd64 -O cfssljson
     chmod +x cfssljson
     sudo mv cfssljson /usr/local/bin
