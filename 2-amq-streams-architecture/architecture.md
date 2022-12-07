@@ -46,7 +46,7 @@
   ./ssl/generate.sh
   ```
 * example result of generate.sh (path ~/amq-streams-2022/2-amq-streams-architecture/ssl/keys, don't worry about warning in result!). 
-* 
+ 
   ![](./../images/cluster-1.png)
   
 ## Start ZooKeeper cluster
@@ -97,6 +97,7 @@ Start the 3 Kafka nodes by running these 3 scripts in different terminals:
   ./scripts/kafka-2.sh
   ```
   example result
+  
   ![](./../images/cluster-3.png)
   
 

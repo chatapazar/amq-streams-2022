@@ -13,3 +13,5 @@
 - [Authentication & Authorization](./5-basic-acl/acl.md)
 - [HTTP Bridge](./6-http-bridge/bridge.md)
 - [Optional: Service Registry on OCP](https://audomsak.gitbook.io/red-hat-service-registry/)
+
+## [Gitbook](https://chatapazar.gitbook.io/amq-streams-training-2022/) version

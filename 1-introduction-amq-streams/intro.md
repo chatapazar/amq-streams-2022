@@ -62,6 +62,7 @@ Basic Red Hat AMQ Streams:
   [2022-11-10 06:36:46,302] INFO ZooKeeper audit is disabled. (org.apache.zookeeper.audit.ZKAuditProvider)
   ```
 * zookeeper terminal
+  
   ![](../images/setup-3.png)
 
 ## Basic Start Kafka Broker
