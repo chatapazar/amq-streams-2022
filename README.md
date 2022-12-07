@@ -11,5 +11,5 @@
 - [Cruise Control](./4-management/cruisecontrol.md)
 - [Monitoring](./4-management/monitor.md)
 - [Authentication & Authorization](./5-basic-acl/acl.md)
-- [HTTP Bridge]()
+- [HTTP Bridge](./6-http-bridge/bridge.md)
 - [Service Registry]()
