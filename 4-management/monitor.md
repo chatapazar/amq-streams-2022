@@ -268,6 +268,11 @@
   ```
 * call curl to http://localhost:9308/metrics for check metrics work!
   ```bash
+  curl http://localhost:9308/metrics
+  ```
+  
+  example result  
+  ```bash
   ...
   # TYPE kafka_consumergroup_lag_sum gauge
   kafka_consumergroup_lag_sum{consumergroup="monitor",topic="my-topic"} 3

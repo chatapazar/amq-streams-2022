@@ -64,7 +64,7 @@ Following below instruction for prepare lab environment:
   ```
 * terminal ready for lab
   ![](images/setup-2.png) 
-* Use the same method to open a new terminal.
+* Use the same method to open a new terminal or split windows with ctrl+b+" or ctrl+b+% and use ctrl+b+d for close current pane
   
 ## Prerequisite Software
 * install openjdk 11

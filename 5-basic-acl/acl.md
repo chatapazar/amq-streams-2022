@@ -62,7 +62,7 @@
   
   ```bash
   cd ~/amq-streams-2022/5-basic-acl
-  export KAFKA_OPTS="-Djava.security.auth.login.config=~/amq-streams-2022/5-basic-acl/kafka/config/jaas.conf"
+  export KAFKA_OPTS="-Djava.security.auth.login.config=/home/student/amq-streams-2022/5-basic-acl/kafka/config/jaas.conf"
   ```
 
 ## Set Kafka Broker Authentication
@@ -97,7 +97,7 @@
 
   ```bash
   cd ~/amq-streams-2022/5-basic-acl
-  export KAFKA_OPTS="-Djava.security.auth.login.config=~/amq-streams-2022/5-basic-acl/kafka/config/jaas.conf"
+  export KAFKA_OPTS="-Djava.security.auth.login.config=/home/student/amq-streams-2022/5-basic-acl/kafka/config/jaas.conf"
   ./kafka/bin/kafka-server-start.sh ./kafka/config/server.properties
   ```
 
@@ -236,6 +236,7 @@
 * Check current access control list
   
   ```bash
+  cd ~/amq-streams-2022/5-basic-acl
   ./kafka/bin/kafka-acls.sh --bootstrap-server localhost:9092 --list --command-config kafka/config/admin.properties 
   ```
   
@@ -362,6 +363,11 @@
   message3
   ```
 
+* exit from kafka console and check current acl
+  ```bash
+  ./kafka/bin/kafka-acls.sh --bootstrap-server localhost:9092 --list --command-config kafka/config/admin.properties 
+  ```
+  
 ## Add authorized for Describe Consumer Group
 * add authorized for describe consumer group to user: charlie
   
