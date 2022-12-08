@@ -1,0 +1,14 @@
+apiVersion: registry.apicur.io/v1
+kind: ApicurioRegistry
+metadata:
+  name: service-registry
+spec:
+  configuration:
+    persistence: sql
+    sql:
+      dataSource:
+        password: "service-registry"
+        userName: "service-registry"
+        url: "jdbc:postgresql://service-registry.user1-service-registry.svc:5432/service-registry"
+  deployment:
+    replicas: 1

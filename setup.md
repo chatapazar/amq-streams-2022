@@ -69,19 +69,19 @@ Following below instruction for prepare lab environment:
 * Use the same method to open a new terminal or split windows with ctrl+b+" or ctrl+b+% and use ctrl+b+d for close current pane
   
 ## Prerequisite Software
-* install openjdk 11
-  - install openjdk 11 command
-    ```bash
-    cd ~
-    sudo yum install -y java-11-openjdk-devel  
-    ```
-  - test java command
+* install openjdk 11 
+    - test java command
     ```bash
     [student@node1 ~]$ java -version
     openjdk version "11.0.17" 2022-10-18 LTS
     OpenJDK Runtime Environment (Red_Hat-11.0.17.0.8-2.el8_6) (build 11.0.17+8-LTS)
     OpenJDK 64-Bit Server VM (Red_Hat-11.0.17.0.8-2.el8_6) (build 11.0.17+8-LTS, mixed mode, sharing)
     [student@node1 ~]$
+    ```
+  - if java not found, install openjdk 11 command
+    ```bash
+    cd ~
+    sudo yum install -y java-11-openjdk-devel  
     ```
   
 * check openssl (rhel already install) for generate/managed ssl
@@ -121,7 +121,7 @@ Following below instruction for prepare lab environment:
     cfssljson -version
     ```
 
-* set default java version to 11 (openjdk 8 come with maven install, you must change default to jdk 11)
+* set default java version to 11 (if you have more than one java version in your system)
   * run command to change java version
     ```bash
     sudo alternatives --config java
