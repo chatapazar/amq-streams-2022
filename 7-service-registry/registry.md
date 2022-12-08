@@ -245,7 +245,7 @@
 
 * Try to run kafka client
   ```bash
-  cd ~/amq-streams-2022/7-service-registry 
+  cd ~/amq-streams-2022/7-service-registry/apicurio-registry-examples/simple-avro 
   mvn compile exec:java -Dexec.mainClass="io.apicurio.registry.examples.simple.avro.SimpleAvroExample"
   ```
 
@@ -289,7 +289,7 @@
  
   * run client again
     ```bash
-    cd ~/amq-streams-2022/7-service-registry 
+    cd ~/amq-streams-2022/7-service-registry/apicurio-registry-examples/simple-avro 
     mvn compile exec:java -Dexec.mainClass="io.apicurio.registry.examples.simple.avro.SimpleAvroExample"
     ```
     
