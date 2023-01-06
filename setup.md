@@ -92,12 +92,13 @@ Following below instruction for prepare lab environment:
   [student@node1 ~]$
   ```
 
-* check & install wget, nc, tmux, maven (if you don't found it in RHEL VM)
+* check & install wget, nc, tmux, maven, tree (if you don't found it in RHEL VM)
   ```bash
   sudo yum install -y tmux
   sudo yum install -y wget
   sudo yum install -y nc
   sudo yum install -y net-tools
+  sudo yum install -y tree
   sudo yum install -y maven
   ```
   
