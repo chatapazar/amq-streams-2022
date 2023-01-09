@@ -4,6 +4,7 @@
 
 - [Consumer and Producer](#consumer-and-producer)
   - [Prerequisite](#prerequisite)
+  - [Start Cluster](#start-cluster)
   - [Consumer Groups](#consumer-groups)
     - [Create a new topic (delete and create new again)](#create-a-new-topic-delete-and-create-new-again)
     - [Setup consumers](#setup-consumers)
@@ -21,7 +22,32 @@
 
 ## Prerequisite
 
-* Setup and start the Zookeeper and Kafka cluster from the [Kafka Architecture demo](../kafka-architecture/). This cluster will be used during this demo. 
+* [Setup Red Hat AMQ Streams Lab](./../setup.md)
+* [Red Hat AMQ Streams Architecture](../2-amq-streams-architecture/architecture.md)
+
+## Start Cluster
+
+* make sure to stop all kafka & zookeeper server
+  * by ctrl+c in your terminal or
+  * call kafka-server-stop.sh for kafka broker and call zookeeper-server-stop.sh for zookeeper
+  * make sure with jps command
+* clear zookeeper & kafka data
+  ```bash
+  rm -rf /tmp/zookeeper*
+  rm -rf /tmp/kafka*
+  ```
+  
+* start the Zookeeper and Kafka cluster from the [Red Hat AMQ Streams Architecture](../2-amq-streams-architecture/architecture.md). This cluster will be used for this lab. run cli in each terminal (1 shell script 1 terminal)
+  ```bash
+  cd ~/amq-streams-2022/2-amq-streams-architecture/
+  ./scripts/zookeeper-0.sh
+  ./scripts/zookeeper-1.sh
+  ./scripts/zookeeper-2.sh
+  ./scripts/kafka-0.sh
+  ./scripts/kafka-1.sh
+  ./scripts/kafka-2.sh
+  ```
+  
 
 ## Consumer Groups
 
