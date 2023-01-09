@@ -207,6 +207,7 @@
   ```
 * Start the console producer for create and send message to topic
   ```bash
+  cd ~/amq-streams-2022/4-management
   ./kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic my-topic
   ```
 * Wait until it is ready (it should show `>`). and send 3 messages.
